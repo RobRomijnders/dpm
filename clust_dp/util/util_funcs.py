@@ -28,6 +28,13 @@ def cholupdowndate_1(R,x,sign = '+'):
     return np.triu(R)
 
 def cholupdowndate(R,x,sign = '+'):
+    """
+    Performs the Rank1 update to the CHolesky decomposition
+    :param R: the upper triangular matrix
+    :param x: the vector to be added
+    :param sign: Wether we consider update (+) of downdate (-)
+    :return:
+    """
     V = R.T.dot(R)
     outer = np.outer(x,x)
     if sign == '+':
@@ -58,6 +65,8 @@ def plot_cov_ellipse(cov, pos, volume=.5, ax=None, fc='none', ec=[0,0,0], a=1, l
         volume : The volume inside the ellipse; defaults to 0.5
         ax : The axis that the ellipse will be plotted on. Defaults to the
             current axis.
+
+    (Note, I copy-pasted this function from somewhere, but I forgot)
     """
 
     def eigsorted(cov):

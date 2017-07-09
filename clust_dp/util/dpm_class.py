@@ -3,7 +3,7 @@ from clust_dp.util.util_funcs import cholupdowndate, ZZ, plot_cov_ellipse
 import matplotlib.pyplot as plt
 import copy
 
-COLORS = ['r','b','k','y','c','m']*2
+COLORS = ['r','b','k','y','c','m']*5
 
 
 class DPM():
@@ -29,15 +29,20 @@ class DPM():
         for _ in range(KK):
             self.qq.append(copy.deepcopy(prior))
 
+        self.include_points(data,z)
+
+
+    def include_points(self,data,z):
         # And add items to the mixture components
         for i,x in enumerate(data):
-            k = self.z[i]
+            k = z[i]
             self.qq[k].num += 1
             self.qq[k].rr += 1
             self.qq[k].nu += 1
             self.qq[k].sigma_chol = cholupdowndate(self.qq[k].sigma_chol, x, '+')
             self.qq[k].mu_ += x
             self.N_k[k] += 1
+        self.NN = sum(self.N_k)
 
 
     def step(self):
@@ -128,13 +133,15 @@ class DPM():
 
     def plot_data(self, direc = 'im', iter=0):
         f, ax = plt.subplots(1, 1) #PyPlot magic *sarcasm*
+        ax.set_xlim(-10,10)
+        ax.set_ylim(-10,10)
         for i in range(self.NN):
             color = COLORS[self.z[i]]
             ax.scatter(self.data[i][0], self.data[i][1], c=color)
         for k in range(self.KK):
             mu, sigma = self.qq[k].get_posterior_NIW(mode='MAP')
             plot_cov_ellipse(sigma, mu, ax=ax, ec=COLORS[k])
-        ax.set_title('step' + str(iter).zfill(4))
+        ax.set_title('step' + str(iter).zfill(4) +'- Num points: %i'%(self.NN))
         plt.savefig(direc+'/step' + str(iter).zfill(4)+'.png')
         plt.close(f)
 

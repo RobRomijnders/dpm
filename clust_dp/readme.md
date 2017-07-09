@@ -1,9 +1,9 @@
 # Introduction
 
-On literally a rainy Sunday afternoon I set out to implement a Dirichlet Process mixture model. My main reason? __To find clusters on streaming data.__
-At one point, every data scientist faces this question: _how many clusters do I model?_. This question gets more cumbersome once you work with streaming data. As more data enters, you probably add more clusters, but that will be heuristics.
+On literally a rainy Sunday afternoon I set out to implement a Dirichlet Process mixture model (DPM). My main reason? __To find clusters on streaming data.__
+At one point, every data scientist faces this question: _how many clusters do I model?_. This question gets more cumbersome once you work with streaming data. As more data enters, you probably add more clusters. You can do that with heuristics, but the DPM solves it naturally. 
 
-So the Dirichlet process formalizes two concerns:
+So the DPM covers two of our concerns:
 
   * We don't know how many clusters to model
   * As more data streams in, we allow more clusters
@@ -11,6 +11,16 @@ So the Dirichlet process formalizes two concerns:
 # Alternatives
 Definitely, there exist alternatives for the first concern, _to pick the number of clusters_. Among others:
 PCA, MDL, AIC, BIC. Even [Wikipedia](https://en.wikipedia.org/wiki/Determining_the_number_of_clusters_in_a_data_set) dedicates a full page to [the question](https://en.wikipedia.org/wiki/Determining_the_number_of_clusters_in_a_data_set)
+
+# Generative model
+The best way to understand the Dirichlet process is to understand how it generates data. Later on, we will discuss how to learn the model.
+
+A Dirichlet process assumes it has infinitely many clusters to draw from. The best intuition I've heard compares this to entering a Chinese restaurant, "based on the seemingly infinite supply of tables at Chinese restaurants. The analogy works as follows: The tables represent clusters, and the customers represent our data. When a person enters the restaurant, he chooses to join an existing table with probability proportional to the number of people already sitting at this table (the `N_k`); otherwise, he may choose to sit at a new table k, with probability proportional to `alpha`. Like the following formulas
+
+![equation]( 
+https://latex.codecogs.com/gif.latex?p(pick&space;\&space;table&space;\&space;k)=\frac{N_k}{\alpha&space;&plus;&space;N}&space;\&space;,\&space;\&space;p(pick&space;\&space;new\&space;table)&space;=&space;\frac{\alpha}{\alpha&space;&plus;&space;N} )
+
+To narrow this metaphor down to our case of data points. For every new point, it picks a cluster with the above formula. And every cluster has a Gaussian distribution associated to it. So in the code `dpm.z[i]` is an integer that indicates your cluster number. Let's call it `dpm.z[i] = k`, then `dpm.q[k]` is a Gaussian distribution over the datapoints for that cluster.
 
 # Find the number of clusters
 The DPM does not require explicitly choose the number of mixtures. That solves our first concern. Unaivoidably, the DPM does require a hyperparameter that controls the number of clusters. It is called `alpha`. Now alpha relates both the numbers of clusters and the number of observations by the following formula:
@@ -23,13 +33,6 @@ Fortunately, the variance is quite big. So changing the alpha does not influence
 To give you some intuition, this plots shows the expected number of clusters when `N=100`.
 [alpha_expected_num_clusters](some_image.png)
 
-#The Dirichlet process can have infinitely many clusters. WHAT?
-A Dirichlet assumes it has infinitely many clusters to draw from. The best intuition I've heard compares this to entering a Chinese restaurant. When you enter a Chinese restaurant, it always seems like they have infinitely many tables. Yet, you'll probably join a table that already has some visitors. (_they probably have the good food, right?!?_). This also explains the role of alpha. You pick a table proportional to the number of people, and you pick a new table proportional to alpha. Like the following formulas
-
-![equation]( 
-https://latex.codecogs.com/gif.latex?p(pick&space;\&space;table&space;\&space;k)=\frac{N_k}{\alpha&space;&plus;&space;N}&space;\&space;,\&space;\&space;p(pick&space;\&space;new\&space;table)&space;=&space;\frac{\alpha}{\alpha&space;&plus;&space;N} )
-
-To narrow this metaphor down to our case of data points. For every new point, it picks a cluster with the above formula. And every cluster has a Gaussian distribution associated to it. So in the code `dpm.z[i]` is an integer that indicates your cluster number. Let's call it `dpm.z[i] = k`, then `dpm.q[k]` is a Gaussian distribution over the datapoints for that cluster.
 
 # Learning the DPM
 We want to know two things:
