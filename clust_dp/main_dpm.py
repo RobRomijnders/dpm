@@ -34,11 +34,11 @@ if __name__ == "__main__":
     s0 = 4 # Standard deviance of the cluster means in the data generation
     ss = 1.0 # Standard deviance of the data per cluster in the data generation
     # s0 and ss together make the relative variance of the means compared to the data (cluster separability)
-    N = 100 # number of data points
+    N_start = 100 # number of data points
 
 
     mu = np.random.randn(dim,trueK)*s0
-    data = generate_dataset(N,trueK,mu,ss,dim)
+    data = generate_dataset(N_start,trueK,mu,ss,dim)
 
     """Set up the priors on the data"""
     q0 = NIW(dim=dim, s0=3, ss=1, nu=3, mu_prior = np.zeros((dim,)))
@@ -47,10 +47,13 @@ if __name__ == "__main__":
     alpha = 1 # concentration parameter for the DP process. See Murphy eq25.17 pg 884
     KK = 1 # initial guesses to make for number of clusters
     #random initial assignments
-    z = np.random.randint(0,KK,(N,))
+    z = np.random.randint(0,KK,(N_start,))
     dpm = DPM(KK, alpha, q0, data, z)
 
     """Start the trial"""
+    points_to_add = 30
+    interval_to_add = 50
+
     numiter = 600
     record = []
     for iter in range(1,numiter):
@@ -60,8 +63,8 @@ if __name__ == "__main__":
         record.append(len(dpm.N_k)) #Keep track of the number of clusters
         if iter%10 == 0:
             dpm.plot_data(iter=iter)
-        if iter%50 == 0:
-            new_data = generate_dataset(30, trueK, mu, ss, dim)
+        if iter%interval_to_add == 0:
+            new_data = generate_dataset(points_to_add, trueK, mu, ss, dim)
             add_points_to_dpm(dpm, new_data,KK)
 
     print(record)
