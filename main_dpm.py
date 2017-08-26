@@ -1,6 +1,6 @@
 import numpy as np
-from clust_dp.util.niw_class import NIW
-from clust_dp.util.dpm_class import DPM
+from util.niw_class import NIW
+from util.dpm_class import DPM
 
 np.random.seed(123)
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     q0 = NIW(dim=dim, s0=3, ss=1, nu=3, mu_prior = np.zeros((dim,)))
 
     """Set up a Mixture model for the Dirichlet process"""
-    alpha = 1 # concentration parameter for the DP process. See Murphy eq25.17 pg 884
+    alpha = 10 # concentration parameter for the DP process. See Murphy eq25.17 pg 884
     KK = 1 # initial guesses to make for number of clusters
     #random initial assignments
     z = np.random.randint(0,KK,(N_start,))
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     points_to_add = 30
     interval_to_add = 50
 
-    numiter = 600
+    numiter = 300
     record = []
     for iter in range(1,numiter):
         dpm.step()

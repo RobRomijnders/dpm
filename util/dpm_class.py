@@ -1,5 +1,5 @@
 import numpy as np
-from clust_dp.util.util_funcs import cholupdowndate, ZZ, plot_cov_ellipse
+from util.util_funcs import cholupdowndate, ZZ, plot_cov_ellipse
 import matplotlib.pyplot as plt
 import copy
 

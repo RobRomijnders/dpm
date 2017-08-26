@@ -1,5 +1,5 @@
 import numpy as np
-from clust_dp.util.util_funcs import cholupdowndate, ZZ, plot_cov_ellipse
+from util.util_funcs import cholupdowndate, ZZ, plot_cov_ellipse
 from scipy.stats import invwishart,multivariate_normal
 
 class NIW():
